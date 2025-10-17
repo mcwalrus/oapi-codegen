@@ -2,7 +2,7 @@
 
 ## Max's version
 
-Traditional merging by `oapi-codegen` is fairly strict and fails on legal declarations of types following the OpenAPI 3.0 spec.
+Traditional `oapi-codegen` is fairly strict and fails on legal declarations of types following the OpenAPI 3.0 spec.
 
 Consider:
 
@@ -25,6 +25,7 @@ For example, the type _begin_at_ with `allOf`of nullable and ref should, in Go, 
 
 * Global namespacing between, funcs, consts, types, enums not handled upstream.
 * More lenient merging of `openapi3.Schemas` to allow for merges across fields other than nullable.
+* Irellevant types added with complex specs.
 
 ## DOCUMENTATION
 
