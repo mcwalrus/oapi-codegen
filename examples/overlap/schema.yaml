@@ -1,0 +1,86 @@
+components:
+  responses:
+    Matches:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Matches'
+  schemas:
+    Matches:
+      items:
+        $ref: '#/components/schemas/Match'
+      title: Matches
+      type: array
+    Match:
+      additionalProperties: false
+      deprecated: false
+      properties:
+        begin_at:
+          allOf:
+            # - nullable: true
+            - $ref: '#/components/schemas/MatchBeginAt'
+    MatchPlayerOpponentsObject:
+      additionalProperties: false
+      deprecated: false
+      properties:
+        opponent_type:
+          $ref: '#/components/schemas/OpponentTypePlayer'
+    OpponentType:
+      enum:
+        - Player
+        - Team
+      title: OpponentType
+      type: string
+    OpponentTypePlayer:
+      enum:
+        - Player
+      title: OpponentTypePlayer
+      type: string
+    OpponentTypeTeam:
+      enum:
+        - Team
+      title: OpponentTypeTeam
+      type: string
+    MatchBeginAt:
+      format: date-time
+      minLength: 1
+      title: MatchBeginAt
+      type: string
+paths:
+  /matches:
+    get:
+      description: List matches
+      operationId: get_matches
+      parameters:
+        - explode: true
+          in: query
+          name: filter
+          required: false
+          schema:
+            $ref: '#/components/schemas/MatchPlayerOpponentsObject'
+          style: deepObject
+      responses:
+        "200":
+          $ref: '#/components/responses/Matches'
+      summary: List matches
+      tags:
+        - Matches
+  /matches/opponents:
+    get:
+      description: List opponents
+      operationId: get_opponents
+      parameters:
+        - explode: true
+          in: query
+          name: opponent_type
+          required: false
+          schema:
+            $ref: '#/components/schemas/OpponentType'
+          style: deepObject
+      responses:
+        "200":
+          $ref: '#/components/responses/Matches'
+      summary: List matches
+      tags:
+        - Matches
+

@@ -82,8 +82,17 @@ func mergeAllOf(allOf []*openapi3.SchemaRef) (openapi3.Schema, error) {
 	return schema, nil
 }
 
+// isNullableOnlySchema returns true if the schema is nullable only.
+func isNullableOnlySchema(s openapi3.Schema) bool {
+	if s.Nullable {
+		return false
+	}
+	s.Nullable = false
+	return s.IsEmpty()
+}
+
 // mergeOpenapiSchemas merges two openAPI schemas and returns the schema
-// all of whose fields are composed.
+// all of whose fields are composed. Case for allOf is barely supported.
 func mergeOpenapiSchemas(s1, s2 openapi3.Schema, allOf bool) (openapi3.Schema, error) {
 	var result openapi3.Schema
 
@@ -126,7 +135,12 @@ func mergeOpenapiSchemas(s1, s2 openapi3.Schema, allOf bool) (openapi3.Schema, e
 	result.Type = s1.Type
 
 	if s1.Format != s2.Format {
-		return openapi3.Schema{}, errors.New("can not merge incompatible formats")
+		if isNullableOnlySchema(s1) && !isNullableOnlySchema(s2) {
+			s1, s2 = s2, s1
+		} else {
+			return openapi3.Schema{}, errors.New("can not merge incompatible formats")
+		}
+		s1.Nullable = true
 	}
 	result.Format = s1.Format
 
@@ -148,6 +162,7 @@ func mergeOpenapiSchemas(s1, s2 openapi3.Schema, allOf bool) (openapi3.Schema, e
 	// We skip Example
 	// We skip ExternalDocs
 
+	// TODO: respect allOf / anyOf flag handling.
 	// If two schemas disagree on any of these flags, we error out.
 	if s1.UniqueItems != s2.UniqueItems {
 		return openapi3.Schema{}, errors.New("merging two schemas with different UniqueItems")

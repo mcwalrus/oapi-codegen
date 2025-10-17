@@ -1,5 +1,33 @@
 # `oapi-codegen`
 
+## Max's version
+
+Traditional merging by `oapi-codegen` is fairly strict and fails on legal declarations of types following the OpenAPI 3.0 spec.
+
+Consider:
+
+```yaml
+components:
+  schemas:
+    Match:
+      additionalProperties: false
+      deprecated: false
+      properties:
+        begin_at:
+          allOf:
+            - nullable: true
+            - $ref: '#/components/schemas/MatchBeginAt'
+```
+
+For example, the type _begin_at_ with `allOf`of nullable and ref should, in Go, become `*MatchBeginAt`. The current library has strict rules regarding conflicts across types regarding formats. In this fork, I have addressed the issue which I am to merge upstream.
+
+### Other issues to consider
+
+* Global namespacing between, funcs, consts, types, enums not handled upstream.
+* More lenient merging of `openapi3.Schemas` to allow for merges across fields other than nullable.
+
+## DOCUMENTATION
+
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9450/badge)](https://www.bestpractices.dev/projects/9450)
 
 `oapi-codegen` is a command-line tool and library to convert OpenAPI specifications to Go code, be it [server-side implementations](#generating-server-side-boilerplate), [API clients](#generating-api-clients), or simply [HTTP models](#generating-api-models).
